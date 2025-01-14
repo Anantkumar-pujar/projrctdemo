@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <link rel="stylesheet" href="uploadstyles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Upload a File</h2>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <label for="file">Choose a file (PDF or Image):</label>
+            <input type="file" id="file" name="file" accept=".pdf, image/*" required>
+            
+            <label for="subject_name">Subject Name:</label>
+            <input type="text" name="subject_name" id="subject_name" required>
+
+            <label for="subject_code">Subject Code:</label>
+            <input type="text" name="subject_code" id="subject_code" required>
+
+            <label for="academic_year">Academic Year:</label>
+            <input type="text" name="academic_year" id="academic_year" required>
+
+            <label for="category">Category:</label>
+            <select name="category" id="category" required>
+                <option value="CIE 1">CIE 1</option>
+                <option value="CIE 2">CIE 2</option>
+                <option value="SEE">SEE</option>
+            </select>
+
+            <label for="uploaded_by">Uploaded By:</label>
+            <input type="text" name="uploaded_by" id="uploaded_by" required>
+
+            <label for="description">Description:</label>
+            <textarea name="description" id="description"></textarea>
+
+            <button type="submit">Upload</button>
+        </form>
+        <div class="file-list" id="fileList">
+            <h3>Uploaded Files</h3>
+            <!-- Files will be listed dynamically here -->
+        </div>
+    </div>
+
+    <script>
+        // Dynamically fetch and display uploaded files
+        fetch('/uploads')
+            .then(response => response.json())
+            .then(files => {
+                const fileList = document.getElementById('fileList');
+                files.forEach(file => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+
+                    const icon = document.createElement('img');
+                    if (file.name.endsWith('.pdf')) {
+                        icon.src = 'pdf-icon.png'; // Add your PDF icon image in the public folder
+                    } else {
+                        icon.src = 'image-icon.png'; // Add your image icon in the public folder
+                    }
+
+                    const fileLink = document.createElement('a');
+                    fileLink.href = file.url;
+                    fileLink.target = '_blank';
+                    fileLink.textContent = file.name;
+
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = file.url;
+                    downloadLink.download = file.name;
+                    downloadLink.textContent = 'Download';
+                    downloadLink.className = 'download';
+
+                    fileItem.appendChild(icon);
+                    fileItem.appendChild(fileLink);
+                    fileItem.appendChild(downloadLink);
+
+                    fileList.appendChild(fileItem);
+                });
+            })
+            .catch(error => console.error('Error fetching files:', error));
+    </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyQHub - Search</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Search Question Papers</h2>
+        <input type="text" id="search-bar" class="form-control" placeholder="Search by subject name or code">
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            var path = [
+  {
+    "display": "Mathematics (MATH101)",
+    "subject_code": "MATH101"
+  },
+  {
+    "display": "Applied Math (MATH102)",
+    "subject_code": "MATH102"
+  }
+]
+;
+
+            $('#search-bar').typeahead({
+                minLength: 2,
+                highlight: true
+            }, {
+                name: 'questions',
+                display: 'display',
+                source: function(query, syncResults, asyncResults) {
+                    $.get(path, { query: query })
+                        .done(function(data) {
+                            asyncResults(data);
+                        })
+                        .fail(function() {
+                            asyncResults([]);
+                        });
+                },
+                templates: {
+                    suggestion: function(data) {
+                        return `<div>${data.display}</div>`;
+                    }
+                }
+            });
+
+            // Handle selection
+            $('#search-bar').on('typeahead:select', function(event, suggestion) {
+                var subject_Code = suggestion.subject_code;
+                window.location.href = '/question-paper/' + subject_Code;
+            });
+        });
+    </script>
+</body>
+</html>
